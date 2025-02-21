@@ -192,7 +192,16 @@ runs:
           -F "Description=${DESCRIPTION}" \
           -F "DeviceType=${DEVICE_TYPE}" \
           -F "File=@${FIRMWARE_PATH}")
-
+        
+        # Parse the JSON response using jq
+        id=$(echo "$uploadResponse" | jq -r '.id')
+        url=$(echo "$uploadResponse" | jq -r '.url')
+        checksum=$(echo "$uploadResponse" | jq -r '.metadata.checksum')
+        size=$(echo "$uploadResponse" | jq -r '.metadata.size')
+        uploadedBy=$(echo "$uploadResponse" | jq -r '.metadata.uploadedBy')
+        uploadedAt=$(echo "$uploadResponse" | jq -r '.metadata.uploadedAt')
+        
+        # Output values for the action outputs
         echo "id=$id" >> $GITHUB_OUTPUT
         echo "url=$url" >> $GITHUB_OUTPUT
         echo "checksum=$checksum" >> $GITHUB_OUTPUT
