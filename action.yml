@@ -177,8 +177,6 @@ runs:
 
         echo "Access token obtained: $API_TOKEN"
         echo "api_token=$API_TOKEN" >> $GITHUB_OUTPUT
-      outputs:
-        api_token: ${{ steps.auth.outputs.api_token }}
 
     - name: Upload Firmware
       id: upload
@@ -201,13 +199,6 @@ runs:
         echo "size=$size" >> $GITHUB_OUTPUT
         echo "uploadedBy=$uploadedBy" >> $GITHUB_OUTPUT
         echo "uploadedAt=$uploadedAt" >> $GITHUB_OUTPUT
-      outputs:
-        id: ${{ steps.upload.outputs.id }}
-        url: ${{ steps.upload.outputs.url }}
-        checksum: ${{ steps.upload.outputs.checksum }}
-        size: ${{ steps.upload.outputs.size }}
-        uploadedBy: ${{ steps.upload.outputs.uploadedBy }}
-        uploadedAt: ${{ steps.upload.outputs.uploadedAt }}
 
     - name: Finalizer
       shell: bash
