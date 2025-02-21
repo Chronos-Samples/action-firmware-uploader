@@ -47,7 +47,6 @@ inputs:
   FIRMWARE_PATH:
     description: "The file path to the firmware zip to upload."
     required: true
-
 outputs:
   ID:
     description: "Unique identifier of the uploaded file."
@@ -196,17 +195,26 @@ runs:
           -F "DeviceType=${DEVICE_TYPE}" \
           -F "File=@${FIRMWARE_PATH}")
 
-        # Set the upload response as output
-        echo "upload_response=$uploadResponse" >> $GITHUB_OUTPUT
+        echo "id=$id" >> $GITHUB_OUTPUT
+        echo "url=$url" >> $GITHUB_OUTPUT
+        echo "checksum=$checksum" >> $GITHUB_OUTPUT
+        echo "size=$size" >> $GITHUB_OUTPUT
+        echo "uploadedBy=$uploadedBy" >> $GITHUB_OUTPUT
+        echo "uploadedAt=$uploadedAt" >> $GITHUB_OUTPUT
       outputs:
-        upload_response: ${{ steps.upload.outputs.upload_response }}
+        id: ${{ steps.upload.outputs.id }}
+        url: ${{ steps.upload.outputs.url }}
+        checksum: ${{ steps.upload.outputs.checksum }}
+        size: ${{ steps.upload.outputs.size }}
+        uploadedBy: ${{ steps.upload.outputs.uploadedBy }}
+        uploadedAt: ${{ steps.upload.outputs.uploadedAt }}
 
     - name: Finalizer
       shell: bash
       run: |
-        echo "ID: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.id')"
-        echo "URL: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.url')"
-        echo "  Checksum: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.checksum')"
-        echo "  Size: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.size')"
-        echo "  Uploaded By: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.uploadedBy')"
-        echo "  Uploaded At: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.uploadedAt')"
+        echo "ID: ${{ steps.upload.outputs.id }}"
+        echo "URL: ${{ steps.upload.outputs.url }}"
+        echo "Checksum: ${{ steps.upload.outputs.checksum }}"
+        echo "Size: ${{ steps.upload.outputs.size }}"
+        echo "Uploaded By: ${{ steps.upload.outputs.uploadedBy }}"
+        echo "Uploaded At: ${{ steps.upload.outputs.uploadedAt }}"
