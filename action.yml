@@ -1,0 +1,212 @@
+name: "Firmware uploader action"
+description: "Uploads OTA firmware to updater API"
+author: "Bogdan Kosarevskyi <bogdan.kosarevskyi@gmail.com>"
+
+inputs:
+  KEYCLOAK_URL:
+    description: "Keycloak URL"
+    required: false
+    default: "https://auth.chronosai.xyz"
+  KEYCLOAK_REALM:
+    description: "The realm in Keycloak to authenticate with. Default is 'master'."
+    required: false
+    default: "master"
+  KEYCLOAK_CLIENT_ID:
+    description: "The client ID for Keycloak access."
+    required: true
+  KEYCLOAK_CLIENT_SECRET:
+    description: "The client secret associated with the Keycloak client."
+    required: true
+  KEYCLOAK_USERNAME:
+    description: "The username for Keycloak authentication."
+    required: true
+  KEYCLOAK_PASSWORD:
+    description: "The password for Keycloak authentication."
+    required: true
+  KEYCLOAK_GRANT_TYPE:
+    description: "The grant type for Keycloak authentication. Commonly set to 'password'."
+    required: false
+    default: "password"
+  API_URL:
+    description: "The URL of the API to interact with. Default: 'https://wss.dev.chronosai.xyz'."
+    required: false
+    default: "https://wss.dev.chronosai.xyz"
+  DEVICE_KIND:
+    description: "The type of device, allowed values: 'nrf' or 'esp'."
+    required: true
+  FIRMWARE_VERSION:
+    description: "The version of the firmware to upload via OTA."
+    required: true
+  DESCRIPTION:
+    description: "What exactly do you not understand about the word \"description\"? What do you expect to see here?"
+    required: false
+    default: ""
+  DEVICE_TYPE:
+    description: "The type of the device, allowed values: 'tag' or 'anchor'."
+    required: true
+  FIRMWARE_PATH:
+    description: "The file path to the firmware zip to upload."
+    required: true
+
+outputs:
+  ID:
+    description: "Unique identifier of the uploaded file."
+    value: "{{ steps.upload.outputs.id }}"
+  URL:
+    description: "URL of the uploaded file."
+    value: "{{ steps.upload.outputs.url }}"
+  Checksum:
+    description: "Checksum of the uploaded file for verification."
+    value: "{{ steps.upload.outputs.metadata.checksum }}"
+  Size:
+    description: "Size of the uploaded file in bytes."
+    value: "{{ steps.upload.outputs.metadata.size }}"
+  UploadedBy:
+    description: "The username of the individual who uploaded the file."
+    value: "{{ steps.upload.outputs.metadata.uploadedBy }}"
+  UploadedAt:
+    description: "Timestamp of when the file was uploaded."
+    value: "{{ steps.upload.outputs.metadata.uploadedAt }}"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Initializer
+      shell: bash
+      run: |
+        KEYCLOAK_URL="${{ inputs.KEYCLOAK_URL }}"
+        KEYCLOAK_REALM="${{ inputs.KEYCLOAK_REALM }}"
+        KEYCLOAK_CLIENT_ID="${{ inputs.KEYCLOAK_CLIENT_ID }}"
+        KEYCLOAK_CLIENT_SECRET="${{ inputs.KEYCLOAK_CLIENT_SECRET }}"
+        KEYCLOAK_USERNAME="${{ inputs.KEYCLOAK_USERNAME }}"
+        KEYCLOAK_PASSWORD="${{ inputs.KEYCLOAK_PASSWORD }}"
+        KEYCLOAK_GRANT_TYPE="${{ inputs.KEYCLOAK_GRANT_TYPE }}"
+        API_URL="${{ inputs.API_URL }}"
+        DEVICE_KIND="${{ inputs.DEVICE_KIND }}"
+        FIRMWARE_VERSION="${{ inputs.FIRMWARE_VERSION }}"
+        DESCRIPTION="${{ inputs.DESCRIPTION }}"
+        DEVICE_TYPE="${{ inputs.DEVICE_TYPE }}"
+        FIRMWARE_PATH="${{ inputs.FIRMWARE_PATH }}"
+        
+        # Validate inputs
+      
+        INVALID_INPUT=false
+        if ! [[ "$KEYCLOAK_URL" =~ ^https?://.+ ]]; then
+         echo "Error: KEYCLOAK_URL must be a valid URL."
+         INVALID_INPUT=true
+        fi
+        
+        if [[ -z "$KEYCLOAK_REALM" || -z "$KEYCLOAK_CLIENT_ID" || -z "$KEYCLOAK_CLIENT_SECRET" || -z "$KEYCLOAK_USERNAME" || -z "$KEYCLOAK_PASSWORD" ]]; then
+         echo "Error: KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_USERNAME, and KEYCLOAK_PASSWORD cannot be empty."
+         INVALID_INPUT=true
+        fi
+
+        if ! [[ "$API_URL" =~ ^https?://.+ ]]; then
+         echo "Error: API_URL must be a valid URL."
+         INVALID_INPUT=true
+        fi
+
+        # Validate DEVICE_KIND as 'nrf' or 'esp'
+        if [[ "$DEVICE_KIND" != "esp" && "$DEVICE_KIND" != "nrf" ]]; then
+         echo "Error: DEVICE_KIND must be either 'esp' or 'nrf'."
+         INVALID_INPUT=true
+        fi
+
+        if [[ -z "$FIRMWARE_VERSION" ]]; then
+         echo "Error: FIRMWARE_VERSION cannot be empty."
+         INVALID_INPUT=true
+        fi
+
+        # Validate DEVICE_TYPE as 'tag' or 'anchor'
+        if [[ "$DEVICE_TYPE" != "tag" && "$DEVICE_TYPE" != "anchor" ]]; then
+         echo "Error: DEVICE_TYPE must be either 'tag' or 'anchor'."
+         INVALID_INPUT=true
+        fi
+
+        if [[ -z "$FIRMWARE_PATH" ]]; then
+         echo "Error: FIRMWARE_PATH cannot be empty."
+         INVALID_INPUT=true
+        fi
+
+        if [[ -z "$DESCRIPTION" ]]; then
+         DESCRIPTION="Does anyone really fills description? Take fw version, I have nothing to say else. $FIRMWARE_VERSION"
+        fi
+
+        # Fail pipeline if validation fails
+        if [[ "$INVALID_INPUT" = true ]]; then
+         echo "Input validation failed. Exiting..."
+         exit 1
+        fi
+
+        echo "All inputs are valid."
+        
+        {
+          echo "KEYCLOAK_URL=$KEYCLOAK_URL"
+          echo "KEYCLOAK_REALM=$KEYCLOAK_REALM"
+          echo "KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID"
+          echo "KEYCLOAK_CLIENT_SECRET=$KEYCLOAK_CLIENT_SECRET"
+          echo "KEYCLOAK_USERNAME=$KEYCLOAK_USERNAME"
+          echo "KEYCLOAK_PASSWORD=$KEYCLOAK_PASSWORD"
+          echo "KEYCLOAK_GRANT_TYPE=$KEYCLOAK_GRANT_TYPE"
+          echo "API_URL=$API_URL"
+          echo "DEVICE_KIND=$DEVICE_KIND"
+          echo "FIRMWARE_VERSION=$FIRMWARE_VERSION"
+          echo "DESCRIPTION=$DESCRIPTION"
+          echo "DEVICE_TYPE=$DEVICE_TYPE"
+          echo "FIRMWARE_PATH=$FIRMWARE_PATH"
+        } >> $GITHUB_ENV
+
+    - name: Get API Token
+      id: auth
+      shell: bash
+      run: |
+        response=$(curl -s -X POST "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" \
+          -H "Content-Type: application/x-www-form-urlencoded" \
+          -d "client_id=${KEYCLOAK_CLIENT_ID}" \
+          -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+          -d "username=${KEYCLOAK_USERNAME}" \
+          -d "password=${KEYCLOAK_PASSWORD}" \
+          -d "grant_type=${KEYCLOAK_GRANT_TYPE}")
+
+        API_TOKEN=$(echo "$response" | jq -r '.access_token')
+
+        if [ -z "$API_TOKEN" ] || [ "$API_TOKEN" == "null" ]; then
+          echo "Failed to retrieve token. Response was:"
+          echo "$response"
+          exit 1
+        fi
+
+        echo "Access token obtained: $API_TOKEN"
+        echo "api_token=$API_TOKEN" >> $GITHUB_OUTPUT
+      outputs:
+        api_token: ${{ steps.auth.outputs.api_token }}
+
+    - name: Upload Firmware
+      id: upload
+      shell: bash
+      run: |
+        uploadResponse=$(curl -s -X 'POST' \
+          "${API_URL}/api/Firmware/upload" \
+          -H "accept: application/json" \
+          -H "Content-Type: multipart/form-data" \
+          -H "Authorization: Bearer ${{ steps.auth.outputs.api_token }}" \
+          -F "Type=${DEVICE_KIND}" \
+          -F "Version=${FIRMWARE_VERSION}" \
+          -F "Description=${DESCRIPTION}" \
+          -F "DeviceType=${DEVICE_TYPE}" \
+          -F "File=@${FIRMWARE_PATH}")
+
+        # Set the upload response as output
+        echo "upload_response=$uploadResponse" >> $GITHUB_OUTPUT
+      outputs:
+        upload_response: ${{ steps.upload.outputs.upload_response }}
+
+    - name: Finalizer
+      shell: bash
+      run: |
+        echo "ID: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.id')"
+        echo "URL: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.url')"
+        echo "  Checksum: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.checksum')"
+        echo "  Size: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.size')"
+        echo "  Uploaded By: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.uploadedBy')"
+        echo "  Uploaded At: $(echo "${{ steps.upload.outputs.upload_response }}" | jq -r '.metadata.uploadedAt')"
