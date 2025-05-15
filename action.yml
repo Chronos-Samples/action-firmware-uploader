@@ -47,6 +47,9 @@ inputs:
   FIRMWARE_PATH:
     description: "The file path to the firmware zip to upload."
     required: true
+  MODEL:
+    description: "The model of the device. Allowed values: 'LocatorLite' or 'xLocator'."
+    required: true
 outputs:
   ID:
     description: "Unique identifier of the uploaded file."
@@ -86,6 +89,7 @@ runs:
         DESCRIPTION="${{ inputs.DESCRIPTION }}"
         DEVICE_TYPE="${{ inputs.DEVICE_TYPE }}"
         FIRMWARE_PATH="${{ inputs.FIRMWARE_PATH }}"
+        MODEL="${{ inputs.MODEL }}"
         
         # Validate inputs
       
@@ -127,6 +131,12 @@ runs:
          INVALID_INPUT=true
         fi
 
+        # Validate MODEL as 'LocatorLite' or 'xLocator'
+        if [[ "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
+         echo "Error: MODEL must be either 'LocatorLite' or 'xLocator'."
+         INVALID_INPUT=true
+        fi
+
         if [[ -z "$DESCRIPTION" ]]; then
          DESCRIPTION="Does anyone really fills description? Take fw version, I have nothing to say else. $FIRMWARE_VERSION"
         fi
@@ -153,6 +163,7 @@ runs:
           echo "DESCRIPTION=$DESCRIPTION"
           echo "DEVICE_TYPE=$DEVICE_TYPE"
           echo "FIRMWARE_PATH=$FIRMWARE_PATH"
+          echo "MODEL=$MODEL"
         } >> $GITHUB_ENV
 
     - name: Get API Token
@@ -191,6 +202,7 @@ runs:
           -F "Version=${FIRMWARE_VERSION}" \
           -F "Description=${DESCRIPTION}" \
           -F "DeviceType=${DEVICE_TYPE}" \
+          -F "Model=${MODEL}" \
           -F "File=@${FIRMWARE_PATH}")
         
         # Parse the JSON response using jq
