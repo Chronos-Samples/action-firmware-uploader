@@ -48,7 +48,7 @@ inputs:
     description: "The file path to the firmware zip to upload."
     required: true
   MODEL:
-    description: "The model of the device. Allowed values: 'LocatorLite' or 'xLocator'."
+    description: "The model of the device. Allowed values: 'SPECTRE', 'LocatorLite' or 'xLocator'."
     required: true
 outputs:
   ID:
@@ -136,8 +136,8 @@ runs:
         fi
 
         # Validate MODEL as 'LocatorLite' or 'xLocator'
-        if [[ "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
-         echo "Error: MODEL must be either 'LocatorLite' or 'xLocator'."
+        if [[ "$MODEL" != "SPECTRE" && "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
+         echo "Error: MODEL must be either 'SPECTRE', 'LocatorLite' or 'xLocator'."
          INVALID_INPUT=true
         fi
 
