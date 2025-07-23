@@ -20,7 +20,7 @@ It authenticates via Keycloak, handles firmware file uploads, and provides metad
 | `DEVICE_KIND`          | The type of device. Allowed values: `nrf` or `esp`.                                                             | Yes      |                                      |
 | `FIRMWARE_VERSION`     | The version of the firmware to be uploaded.                                                                    | Yes      |                                      |
 | `DESCRIPTION`          | A description of the firmware.                                                                                 | No       |                                      |
-| `DEVICE_TYPE`          | The type of the device. Allowed values: `tag` or `anchor`.                                                     | Yes      |                                      |
+| `DEVICE_TYPE`          | The type of the device. Allowed values: `node`.                      | Yes      |                                      |
 | `FIRMWARE_PATH`        | The file path to the firmware zip file for upload.                                                             | Yes      |                                      |
 
 ---
@@ -52,7 +52,7 @@ Below is an example of how to use this GitHub Action:
           KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
           DEVICE_KIND: "nrf"
           FIRMWARE_VERSION: "1.0.0"
-          DEVICE_TYPE: "tag"
+          DEVICE_TYPE: "node"
           FIRMWARE_PATH: "./firmware.zip"
 
       - name: Use Upload Metadata
