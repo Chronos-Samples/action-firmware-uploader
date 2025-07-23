@@ -120,10 +120,14 @@ runs:
          INVALID_INPUT=true
         fi
 
-        # Validate DEVICE_TYPE as 'tag' or 'anchor'
-        if [[ "$DEVICE_TYPE" != "tag" && "$DEVICE_TYPE" != "anchor" ]]; then
-         echo "Error: DEVICE_TYPE must be either 'tag' or 'anchor'."
-         INVALID_INPUT=true
+        # Validate DEVICE_TYPE as 'node' only.
+        if [[ "$DEVICE_TYPE" != "node" ]]; then
+          if [[ "$DEVICE_TYPE" == "anchor" || "$DEVICE_TYPE" == "tag" ]]; then
+            echo "Error: DEVICE_TYPE '$DEVICE_TYPE' is not allowed. Please use 'node' instead."
+          else
+            echo "Error: DEVICE_TYPE must be 'node'."
+          fi
+          INVALID_INPUT=true
         fi
 
         if [[ -z "$FIRMWARE_PATH" ]]; then
