@@ -22,7 +22,7 @@ It authenticates via Keycloak, handles firmware file uploads, and provides metad
 | `DESCRIPTION`          | A description of the firmware.                                                                                 | No       |                                      |
 | `DEVICE_TYPE`          | The type of the device. Allowed values: `node`.                      | Yes      |                                      |
 | `FIRMWARE_PATH`        | The file path to the firmware zip file for upload.                                                             | Yes      |                                      |
-| `MODEL`              | The model of the device. 'LocatorLite', 'xLocator', 'SPECTRE', "SpectreNode" or "SpectreMavlink". | Yes      |                                      |
+| `MODEL`              | The model of the device. 'LocatorLite', 'xLocator', 'SPECTRE', "xSpot" or "SpectreMavlink". | Yes      |                                      |
 
 ---
 
