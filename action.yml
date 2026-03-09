@@ -48,7 +48,7 @@ inputs:
     description: "The file path to the firmware zip to upload."
     required: true
   MODEL:
-    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', "xSpot" or "SpectreMavlink"."
+    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot' or 'SpectreMavlink'."
     required: true
 outputs:
   ID:
@@ -90,15 +90,15 @@ runs:
         DEVICE_TYPE="${{ inputs.DEVICE_TYPE }}"
         FIRMWARE_PATH="${{ inputs.FIRMWARE_PATH }}"
         MODEL="${{ inputs.MODEL }}"
-        
+
         # Validate inputs
-      
+
         INVALID_INPUT=false
         if ! [[ "$KEYCLOAK_URL" =~ ^https?://.+ ]]; then
          echo "Error: KEYCLOAK_URL must be a valid URL."
          INVALID_INPUT=true
         fi
-        
+
         if [[ -z "$KEYCLOAK_REALM" || -z "$KEYCLOAK_CLIENT_ID" || -z "$KEYCLOAK_CLIENT_SECRET" || -z "$KEYCLOAK_USERNAME" || -z "$KEYCLOAK_PASSWORD" ]]; then
          echo "Error: KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, KEYCLOAK_USERNAME, and KEYCLOAK_PASSWORD cannot be empty."
          INVALID_INPUT=true
@@ -152,7 +152,7 @@ runs:
         fi
 
         echo "All inputs are valid."
-        
+
         {
           echo "KEYCLOAK_URL=$KEYCLOAK_URL"
           echo "KEYCLOAK_REALM=$KEYCLOAK_REALM"
@@ -208,7 +208,7 @@ runs:
           -F "DeviceType=${DEVICE_TYPE}" \
           -F "Model=${MODEL}" \
           -F "File=@${FIRMWARE_PATH}")
-        
+
         # Parse the JSON response using jq
         id=$(echo "$uploadResponse" | jq -r '.id')
         url=$(echo "$uploadResponse" | jq -r '.url')
@@ -216,7 +216,7 @@ runs:
         size=$(echo "$uploadResponse" | jq -r '.metadata.size')
         uploadedBy=$(echo "$uploadResponse" | jq -r '.metadata.uploadedBy')
         uploadedAt=$(echo "$uploadResponse" | jq -r '.metadata.uploadedAt')
-        
+
         # Output values for the action outputs
         echo "id=$id" >> $GITHUB_OUTPUT
         echo "url=$url" >> $GITHUB_OUTPUT
