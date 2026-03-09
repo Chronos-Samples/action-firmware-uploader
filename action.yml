@@ -136,7 +136,7 @@ runs:
         fi
 
         # Validate MODEL as 'LocatorLite' or 'xLocator'
-        if [[ "$MODEL" != "SPECTRE" && "$MODEL" != "xSpot" && "$MODEL" != "SpectreMavlink" && "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
+        if [[ "$MODEL" != "SPECTRE" && "$MODEL" != "Spectre" && "$MODEL" != "xSpot" && "$MODEL" != "SpectreMavlink" && "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
          echo "Error: MODEL must be either 'LocatorLite', 'xLocator', 'SPECTRE', "xSpot" or "SpectreMavlink"."
          INVALID_INPUT=true
         fi
