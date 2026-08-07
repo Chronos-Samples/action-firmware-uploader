@@ -48,7 +48,7 @@ inputs:
     description: "The file path to the firmware zip to upload."
     required: true
   MODEL:
-    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot' or 'SpectreMavlink'."
+    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot', 'xSpot3000', 'SpectreMavlink', 'SpectreNode', 'SpectreMasterAnchor' or 'DroneTag'."
     required: true
 outputs:
   ID:
@@ -135,9 +135,17 @@ runs:
          INVALID_INPUT=true
         fi
 
-        # Validate MODEL as 'LocatorLite' or 'xLocator'
-        if [[ "$MODEL" != "SPECTRE" && "$MODEL" != "Spectre" && "$MODEL" != "xSpot" && "$MODEL" != "SpectreMavlink" && "$MODEL" != "LocatorLite" && "$MODEL" != "xLocator" ]]; then
-         echo "Error: MODEL must be either 'LocatorLite', 'xLocator', 'SPECTRE', "xSpot" or "SpectreMavlink"."
+        # Validate MODEL against the known device models
+        ALLOWED_MODELS=("SPECTRE" "Spectre" "SpectreNode" "SpectreMavlink" "SpectreMasterAnchor" "DroneTag" "xSpot" "xSpot3000" "LocatorLite" "xLocator")
+        MODEL_OK=false
+        for allowed in "${ALLOWED_MODELS[@]}"; do
+          if [[ "$MODEL" == "$allowed" ]]; then
+            MODEL_OK=true
+            break
+          fi
+        done
+        if [[ "$MODEL_OK" != true ]]; then
+         echo "Error: MODEL must be one of: ${ALLOWED_MODELS[*]}."
          INVALID_INPUT=true
         fi
 
