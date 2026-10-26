@@ -48,7 +48,7 @@ inputs:
     description: "The file path to the firmware zip to upload."
     required: true
   MODEL:
-    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot', 'xSpot3000', 'SpectreMavlink', 'SpectreNode', 'SpectreMasterAnchor' or 'DroneTag'."
+    description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot', 'xSpot3000', 'wTag', 'SpectreMavlink', 'SpectreNode', 'SpectreMasterAnchor' or 'DroneTag'."
     required: true
 outputs:
   ID:
@@ -136,7 +136,7 @@ runs:
         fi
 
         # Validate MODEL against the known device models
-        ALLOWED_MODELS=("SPECTRE" "Spectre" "SpectreNode" "SpectreMavlink" "SpectreMasterAnchor" "DroneTag" "xSpot" "xSpot3000" "LocatorLite" "xLocator")
+        ALLOWED_MODELS=("SPECTRE" "Spectre" "SpectreNode" "SpectreMavlink" "SpectreMasterAnchor" "DroneTag" "xSpot" "xSpot3000" "wTag" "LocatorLite" "xLocator")
         MODEL_OK=false
         for allowed in "${ALLOWED_MODELS[@]}"; do
           if [[ "$MODEL" == "$allowed" ]]; then
