@@ -50,6 +50,9 @@ inputs:
   MODEL:
     description: "The model of the device. Allowed values: 'LocatorLite', 'xLocator', 'SPECTRE', 'xSpot', 'xSpot3000', 'wTag', 'SpectreMavlink', 'SpectreNode', 'SpectreMasterAnchor' or 'DroneTag'."
     required: true
+  HW_PROFILE:
+    description: "The hardware profile of the device. Sent to the API as 'HwProfile'; may be an empty string."
+    required: true
 outputs:
   ID:
     description: "Unique identifier of the uploaded file."
@@ -90,6 +93,7 @@ runs:
         DEVICE_TYPE="${{ inputs.DEVICE_TYPE }}"
         FIRMWARE_PATH="${{ inputs.FIRMWARE_PATH }}"
         MODEL="${{ inputs.MODEL }}"
+        HW_PROFILE="${{ inputs.HW_PROFILE }}"
 
         # Validate inputs
 
@@ -176,6 +180,7 @@ runs:
           echo "DEVICE_TYPE=$DEVICE_TYPE"
           echo "FIRMWARE_PATH=$FIRMWARE_PATH"
           echo "MODEL=$MODEL"
+          echo "HW_PROFILE=$HW_PROFILE"
         } >> $GITHUB_ENV
 
     - name: Get API Token
@@ -215,6 +220,7 @@ runs:
           -F "Description=${DESCRIPTION}" \
           -F "DeviceType=${DEVICE_TYPE}" \
           -F "Model=${MODEL}" \
+          -F "HwProfile=${HW_PROFILE}" \
           -F "File=@${FIRMWARE_PATH}")
 
         # Parse the JSON response using jq
